@@ -130,8 +130,10 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$hook_invocation_functions = array(
 			'do_action',
 			'do_action_ref_array',
+			'do_action_deprecated',
 			'apply_filters',
 			'apply_filters_ref_array',
+			'apply_filters_deprecated',
 		);
 
 		// Check if the current token content is one of the filter functions.
