@@ -157,18 +157,6 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		list( $doc_block_start_token, $doc_block_end_token ) = $docblock;
 
-		$version_token = static::parse_since_tags( $phpcs_file, $doc_block_start_token, $doc_block_end_token );
-		if ( false === $version_token ) {
-			$docblock_content = GetTokensAsString::compact( $phpcs_file, $doc_block_start_token, $doc_block_end_token, false );
-			if ( false !== stripos( $docblock_content, 'This filter is documented in ' ) ) {
-				// The hook is documented elsewhere.
-				return;
-			}
-
-			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
-			return;
-		}
-
 		$version_tags = static::parse_since_tags( $phpcs_file, $doc_block_start_token, $doc_block_end_token );
 		if ( empty( $version_tags ) ) {
 			$docblock_content = GetTokensAsString::compact( $phpcs_file, $doc_block_start_token, $doc_block_end_token, false );
