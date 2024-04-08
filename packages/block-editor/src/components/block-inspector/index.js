@@ -17,6 +17,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import MultiSelectionInspector, {
@@ -76,6 +77,11 @@ function BlockInspectorContentLockedParent( { clientId } ) {
 		[ clientId ]
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
+	const contentClientIdsWithControls = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getContentOnlyControlsBlocks(),
+		[]
+	);
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard
@@ -86,7 +92,10 @@ function BlockInspectorContentLockedParent( { clientId } ) {
 			<BlockInfo.Slot />
 			{ contentClientIds.length > 0 && (
 				<PanelBody title={ __( 'Content' ) }>
-					<BlockQuickNavigation clientIds={ contentClientIds } />
+					<BlockQuickNavigation
+						clientIds={ contentClientIds }
+						clientIdsWithControls={ contentClientIdsWithControls }
+					/>
 				</PanelBody>
 			) }
 		</div>
