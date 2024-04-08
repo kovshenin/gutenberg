@@ -271,12 +271,8 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		$violation_code = 'MissingPropertySinceTag';
 
-		$scope_modifier = Variables::getMemberProperties( $phpcs_file, $stack_pointer )['scope'];
-		if ( ( $scope_modifier === 'protected'
-				&& $this->minimumVisibility === 'public' )
-			|| ( $scope_modifier === 'private'
-					&& ( $this->minimumVisibility === 'public' || $this->minimumVisibility === 'protected' ) )
-		) {
+		$visibility = Variables::getMemberProperties( $phpcs_file, $stack_pointer )['scope'];
+		if ( $this->check_below_minimum_visibility( $visibility ) ) {
 			return;
 		}
 
@@ -335,12 +331,8 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$violation_code = 'MissingFunctionSinceTag';
 
 		if ( $is_oo_method ) {
-			$scope_modifier = FunctionDeclarations::getProperties( $phpcs_file, $stack_pointer )['scope'];
-			if ( ( $scope_modifier === 'protected'
-					&& $this->minimumVisibility === 'public' )
-				|| ( $scope_modifier === 'private'
-						&& ( $this->minimumVisibility === 'public' || $this->minimumVisibility === 'protected' ) )
-			) {
+			$visibility = FunctionDeclarations::getProperties( $phpcs_file, $stack_pointer )['scope'];
+			if ( $this->check_below_minimum_visibility( $visibility ) ) {
 				return;
 			}
 
@@ -406,6 +398,24 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		}
 
 		return version_compare( $version, '0.0.1', '>=' );
+	}
+
+	/**
+	 * Checks if the provided visibility level is below the set minimum visibility level.
+	 *
+	 * @param string $visibility The visibility level to check.
+	 * @return bool Returns true if the provided visibility level is below the minimum visibility level, false otherwise.
+	 */
+	protected function check_below_minimum_visibility( $visibility ) {
+		if ( 'public' === $this->minimumVisibility && in_array( $visibility, array( 'protected', 'private' ), true ) ) {
+			return true;
+		}
+
+		if ( 'protected' === $this->minimumVisibility && 'private' === $visibility ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
