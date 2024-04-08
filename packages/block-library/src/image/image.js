@@ -557,7 +557,7 @@ export default function Image( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
-			{ isContentOnlyMode && isSingleSelected && (
+			{ isContentOnlyMode && (
 				// Add some extra controls for content attributes when content only mode is active.
 				<InspectorControls group="contentOnly">
 					<ToolsPanel

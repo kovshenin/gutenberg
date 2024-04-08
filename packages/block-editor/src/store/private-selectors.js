@@ -380,3 +380,7 @@ export function isDragging( state ) {
 export function getExpandedBlock( state ) {
 	return state.expandedBlock;
 }
+
+export function getContentOnlyControlsBlocks( state ) {
+	return state.contentOnlyControlsBlocks;
+}
