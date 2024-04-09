@@ -160,7 +160,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				}
 			}
 
-			if ( ! isset( $hook_documented_elsewhere ) ) {
+			if ( empty( $hook_documented_elsewhere ) ) {
 				$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
 			}
 
