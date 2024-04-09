@@ -286,7 +286,7 @@ abstract class Bar_Abstract {
 	 * @since
 	 * 123
 	 */
-	public function bar() {
+	public function apply_filters() {
 	}
 
 	/**
@@ -582,3 +582,33 @@ $result = apply_filters( 'some_filter', array() );
  * @since
  */
 $result = apply_filters( 'some_filter', array() );
+
+if ( ! function_exists( 'do_action' ) ) {
+	function do_action() {
+	}
+}
+
+if ( ! function_exists( 'do_action_ref_array' ) ) {
+	function do_action_ref_array() {
+	}
+}
+
+if ( ! function_exists( 'do_action_deprecated' ) ) {
+	function do_action_deprecated() {
+	}
+}
+
+if ( ! function_exists( 'apply_filters' ) ) {
+	function apply_filters() {
+	}
+}
+
+if ( ! function_exists( 'apply_filters_ref_array' ) ) {
+	function apply_filters_ref_array() {
+	}
+}
+
+if ( ! function_exists( 'apply_filters_deprecated' ) ) {
+	function apply_filters_deprecated() {
+	}
+}

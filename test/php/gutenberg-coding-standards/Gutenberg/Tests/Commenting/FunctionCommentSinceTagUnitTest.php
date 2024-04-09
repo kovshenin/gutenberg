@@ -149,6 +149,13 @@ final class FunctionCommentSinceTagUnitTest extends AbstractSniffUnitTest {
 			579 => 1,
 			581 => 1,
 			582 => 1,
+			587 => 1,
+			592 => 1,
+			597 => 1,
+			602 => 1,
+			607 => 1,
+			612 => 1,
+
 		);
 	}
 
