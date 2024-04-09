@@ -104,7 +104,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
-		if ( 'T_STRING' === $token['type'] ) {
+		if ( 'T_STRING' === $token['type'] && static::is_function_call( $phpcsFile, $stackPtr ) ) {
 			$this->process_hook( $phpcsFile, $stackPtr );
 			return;
 		}
@@ -439,6 +439,41 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		}
 
 		return static::find_docblock( $phpcs_file, 0 );
+	}
+
+	/**
+	 * Determines if a T_STRING token represents a function call.
+	 *
+	 * @param File $phpcs_file    The file being scanned.
+	 * @param int  $stack_pointer The position to start looking for the docblock.    *
+	 * @return bool True if the token represents a function call, false otherwise.
+	 */
+	protected static function is_function_call( File $phpcs_file, $stack_pointer ) {
+		$tokens = $phpcs_file->getTokens();
+
+		// Find the next non-empty token.
+		$open_bracket = $phpcs_file->findNext( Tokens::$emptyTokens, ( $stack_pointer + 1 ), null, true );
+
+		if ( T_OPEN_PARENTHESIS !== $tokens[ $open_bracket ]['code'] ) {
+			// Not a function call.
+			return false;
+		}
+
+		if ( isset( $tokens[ $open_bracket ]['parenthesis_closer'] ) === false ) {
+			// Not a function call.
+			return false;
+		}
+
+		// Find the previous non-empty token.
+		$search   = Tokens::$emptyTokens;
+		$search[] = T_BITWISE_AND;
+		$previous = $phpcs_file->findPrevious( $search, ( $stack_pointer - 1 ), null, true );
+		if ( T_FUNCTION === $tokens[ $previous ]['code'] ) {
+			// It's a function definition, not a function call.
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
