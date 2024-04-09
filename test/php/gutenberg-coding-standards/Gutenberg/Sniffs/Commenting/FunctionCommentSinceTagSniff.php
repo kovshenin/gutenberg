@@ -155,11 +155,9 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
-		list( $doc_block_start_token, $doc_block_end_token ) = $docblock;
-
-		$version_tags = static::parse_since_tags( $phpcs_file, $doc_block_start_token, $doc_block_end_token );
+		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
-			$docblock_content = GetTokensAsString::compact( $phpcs_file, $doc_block_start_token, $doc_block_end_token, false );
+			$docblock_content = GetTokensAsString::compact( $phpcs_file, $docblock['start_token'], $docblock['end_token'], false );
 			if ( false === stripos( $docblock_content, 'This filter is documented in ' ) ) {
 				$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
 			}
@@ -219,9 +217,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
-		list( $doc_block_start_token, $doc_block_end_token ) = $docblock;
-
-		$version_tags = static::parse_since_tags( $phpcs_file, $doc_block_start_token, $doc_block_end_token );
+		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
 			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
 			return;
@@ -282,9 +278,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
-		list( $doc_block_start_token, $doc_block_end_token ) = $docblock;
-
-		$version_tags = static::parse_since_tags( $phpcs_file, $doc_block_start_token, $doc_block_end_token );
+		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
 			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
 			return;
@@ -352,9 +346,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
-		list( $doc_block_start_token, $doc_block_end_token ) = $docblock;
-
-		$version_tags = static::parse_since_tags( $phpcs_file, $doc_block_start_token, $doc_block_end_token );
+		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
 			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
 			return;
@@ -425,7 +417,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 *
 	 * @param File $phpcs_file    The file being scanned.
 	 * @param int  $stack_pointer The position to start looking for the docblock.
-	 * @return array|false The start and end tokens of the docblock, or false if not found.
+	 * @return array|false An associative array containing the start and end tokens of the docblock, or false if not found.
 	 */
 	protected static function find_hook_docblock( File $phpcs_file, $stack_pointer ) {
 		$tokens       = $phpcs_file->getTokens();
@@ -482,7 +474,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 *
 	 * @param File $phpcs_file    The file being scanned.
 	 * @param int  $stack_pointer The position (stack pointer) in the token stack from which to start searching backwards.
-	 * @return array|false An array with the starting and ending token positions of the found docblock, or false if no docblock is found.
+	 * @return array|false An associative array containing the start and end tokens of the docblock, or false if not found.
 	 */
 	protected static function find_docblock( File $phpcs_file, $stack_pointer ) {
 		$tokens                 = $phpcs_file->getTokens();
@@ -521,30 +513,29 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		}
 
 		return array(
-			$tokens[ $comment_end ]['comment_opener'],
-			$comment_end,
+			'start_token' => $tokens[ $comment_end ]['comment_opener'],
+			'end_token'   => $comment_end,
 		);
 	}
 
 	/**
 	 * Searches for @since values within a docblock.
 	 *
-	 * @param File $phpcs_file            The file being scanned.
-	 * @param int  $doc_block_start_token The token index where the docblock starts.
-	 * @param int  $doc_block_end_token   The token index where the docblock ends.
+	 * @param File  $phpcs_file The file being scanned.
+	 * @param array $docblock   An associative array containing the start and end tokens of the docblock.
 	 * @return array Returns an array of "@since" tokens and their corresponding value tokens.
 	 */
-	protected static function parse_since_tags( File $phpcs_file, $doc_block_start_token, $doc_block_end_token ) {
+	protected static function parse_since_tags( File $phpcs_file, $docblock ) {
 		$tokens = $phpcs_file->getTokens();
 
 		$version_tags = array();
 
-		for ( $i = $doc_block_start_token + 1; $i < $doc_block_end_token; $i++ ) {
+		for ( $i = $docblock['start_token'] + 1; $i < $docblock['end_token']; $i++ ) {
 			if ( ! ( T_DOC_COMMENT_TAG === $tokens[ $i ]['code'] && '@since' === $tokens[ $i ]['content'] ) ) {
 				continue;
 			}
 
-			$version_token = $phpcs_file->findNext( T_DOC_COMMENT_WHITESPACE, $i + 1, $doc_block_end_token, true, null, true );
+			$version_token = $phpcs_file->findNext( T_DOC_COMMENT_WHITESPACE, $i + 1, $docblock['end_token'], true, null, true );
 			if ( ( false === $version_token ) || ( T_DOC_COMMENT_STRING !== $tokens[ $version_token ]['code'] ) ) {
 				$version_tags[ $i ] = null;
 				continue;
