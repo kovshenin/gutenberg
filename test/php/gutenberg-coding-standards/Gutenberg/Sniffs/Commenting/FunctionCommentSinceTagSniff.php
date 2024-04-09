@@ -150,19 +150,20 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$violation_code = 'MissingHookSinceTag';
 
 		$docblock = static::find_hook_docblock( $phpcs_file, $stack_pointer );
-		if ( false === $docblock ) {
-			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
-			return;
-		}
 
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
-			$docblock_content = GetTokensAsString::compact( $phpcs_file, $docblock['start_token'], $docblock['end_token'], false );
-			if ( false === stripos( $docblock_content, 'This filter is documented in ' ) ) {
+			if ( false !== $docblock ) {
+				$docblock_content = GetTokensAsString::compact( $phpcs_file, $docblock['start_token'], $docblock['end_token'], false );
+				if ( false !== stripos( $docblock_content, 'This filter is documented in ' ) ) {
+					$hook_documented_elsewhere = true;
+				}
+			}
+
+			if ( ! isset( $hook_documented_elsewhere ) ) {
 				$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
 			}
 
-			// The hook is documented elsewhere.
 			return;
 		}
 
@@ -212,10 +213,6 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$violation_code = 'Missing' . $capitalized_token_type . 'SinceTag';
 
 		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
-		if ( false === $docblock ) {
-			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
-			return;
-		}
 
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
@@ -273,10 +270,6 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		}
 
 		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
-		if ( false === $docblock ) {
-			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
-			return;
-		}
 
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
@@ -341,10 +334,6 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		);
 
 		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
-		if ( false === $docblock ) {
-			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
-			return;
-		}
 
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
@@ -521,14 +510,18 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	/**
 	 * Searches for @since values within a docblock.
 	 *
-	 * @param File  $phpcs_file The file being scanned.
-	 * @param array $docblock   An associative array containing the start and end tokens of the docblock.
+	 * @param File        $phpcs_file The file being scanned.
+	 * @param array|false $docblock   An associative array containing the start and end tokens of the docblock, or false if not exists.
 	 * @return array Returns an array of "@since" tokens and their corresponding value tokens.
 	 */
 	protected static function parse_since_tags( File $phpcs_file, $docblock ) {
-		$tokens = $phpcs_file->getTokens();
-
 		$version_tags = array();
+
+		if ( false === $docblock ) {
+			return $version_tags;
+		}
+
+		$tokens = $phpcs_file->getTokens();
 
 		for ( $i = $docblock['start_token'] + 1; $i < $docblock['end_token']; $i++ ) {
 			if ( ! ( T_DOC_COMMENT_TAG === $tokens[ $i ]['code'] && '@since' === $tokens[ $i ]['content'] ) ) {
