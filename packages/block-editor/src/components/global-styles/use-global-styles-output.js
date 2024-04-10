@@ -315,6 +315,7 @@ const getFeatureDeclarations = ( selectors, styles ) => {
  * @param {Object}  tree                A theme.json tree containing layout definitions.
  *
  * @param {boolean} isTemplate          Whether the entity being edited is a full template or a pattern.
+ * @param {Object}  editorSettings      Current editor settings.
  * @return {Array} An array of style declarations.
  */
 export function getStylesDeclarations(
@@ -323,7 +324,7 @@ export function getStylesDeclarations(
 	useRootPaddingAlign,
 	tree = {},
 	isTemplate = true,
-	settings
+	editorSettings
 ) {
 	const { kebabCase } = unlock( componentsPrivateApis );
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
@@ -402,7 +403,7 @@ export function getStylesDeclarations(
 				...blockStyles.background,
 				...getBackgroundSupportStyles(
 					blockStyles.background,
-					settings
+					editorSettings
 				),
 			},
 		};
@@ -794,7 +795,7 @@ export const toStyles = (
 	hasFallbackGapSupport,
 	disableLayoutStyles = false,
 	isTemplate = true,
-	settings = {}
+	editorSettings = {}
 ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
@@ -905,7 +906,7 @@ export const toStyles = (
 									styleVariationSelector,
 									useRootPaddingAlign,
 									tree,
-									settings,
+									editorSettings
 								);
 							if ( styleVariationDeclarations.length ) {
 								ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
@@ -954,7 +955,7 @@ export const toStyles = (
 				useRootPaddingAlign,
 				tree,
 				isTemplate,
-				settings
+				editorSettings
 			);
 			if ( declarations?.length ) {
 				ruleset += `:where(${ selector }){${ declarations.join(
@@ -1219,7 +1220,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const { themeDirURI, disableLayoutStyles } = useSelect( ( select ) => {
 		const _settings = select( blockEditorStore ).getSettings();
 		return {
-			themeDirURI: _settings?.currentTheme?.theme_directory_uri,
+			themeDirURI: _settings?.currentTheme?.directoryURI,
 			disableLayoutStyles: !! _settings.disableLayoutStyles,
 		};
 	} );
