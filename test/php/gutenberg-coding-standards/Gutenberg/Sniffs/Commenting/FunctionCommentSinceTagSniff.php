@@ -408,7 +408,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 * @param string $token_type The type of token (e.g., Function, Property) to retrieve violation codes for.
 	 * @return array An array containing violation codes for missing since tag, missing version value, and invalid version value.
 	 */
-	protected function get_violation_codes( $token_type ) {
+	protected static function get_violation_codes( $token_type ) {
 		return array(
 			'missing_since_tag'     => 'Missing' . $token_type . 'SinceTag',
 			'missing_version_value' => 'Missing' . $token_type . 'VersionValue',
