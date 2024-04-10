@@ -155,7 +155,6 @@ final class SinceTagUnitTest extends AbstractSniffUnitTest {
 			602 => 1,
 			607 => 1,
 			612 => 1,
-
 		);
 	}
 
