@@ -256,30 +256,38 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$property_name                   = $tokens[ $stack_pointer ]['content'];
 		$oo_token                        = Scopes::validDirectScope( $phpcs_file, $stack_pointer, Collections::ooPropertyScopes() );
 		$class_name                      = ObjectDeclarations::getName( $phpcs_file, $oo_token );
-		$missing_since_tag_error_message = sprintf(
-			'@since tag is missing for the "%s::%s" property.',
-			$class_name,
-			$property_name
-		);
-
-		$violation_code = 'MissingPropertySinceTag';
 
 		$visibility = Variables::getMemberProperties( $phpcs_file, $stack_pointer )['scope'];
 		if ( $this->check_below_minimum_visibility( $visibility ) ) {
 			return;
 		}
 
+		$error_message_data = array(
+			$class_name,
+			$property_name
+		);
+
 		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
 
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
-			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
+			$phpcs_file->addError(
+				'Missing @since tag for the "%s::%s" property.',
+				$stack_pointer,
+				'MissingPropertySinceTag',
+				$error_message_data
+			);
 			return;
 		}
 
 		foreach ( $version_tags as $since_tag_token => $version_value_token ) {
 			if ( null === $version_value_token ) {
-				$phpcs_file->addError( $missing_since_tag_error_message, $since_tag_token, $violation_code );
+				$phpcs_file->addError(
+					'Missing @since tag version value for the "%s::%s" property.',
+					$since_tag_token,
+					'MissingPropertySinceTagVersionValue',
+					$error_message_data
+				);
 				continue;
 			}
 
@@ -293,11 +301,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				'Invalid @since version value for the "%s::%s" property: "%s". Version value must be greater than or equal to 0.0.1.',
 				$version_value_token,
 				'InvalidPropertySinceTagVersionValue',
-				array(
-					$class_name,
-					$property_name,
-					$version_value,
-				)
+				array_merge( $error_message_data, array( $version_value ) )
 			);
 		}
 	}
@@ -331,12 +335,12 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$invalid_version_value_violation_code = 'InvalidMethodSinceTagVersionValue';
 		}
 
-		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
-
 		$error_message_data = array(
 			$function_name,
 			$is_oo_method ? 'method' : 'function',
 		);
+
+		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
 
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
