@@ -142,12 +142,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
-		$missing_since_tag_error_message = sprintf(
-			'@since tag is missing for the "%s()" hook function.',
-			$hook_function
-		);
-
-		$violation_code = 'MissingHookSinceTag';
+		$error_message_data = array( $hook_function );
 
 		$docblock = static::find_hook_docblock( $phpcs_file, $stack_pointer );
 
@@ -161,7 +156,12 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			}
 
 			if ( empty( $hook_documented_elsewhere ) ) {
-				$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
+				$phpcs_file->addError(
+					'Missing @since tag for the "%s()" hook function.',
+					$stack_pointer,
+					'MissingHookSinceTag',
+					$error_message_data
+				);
 			}
 
 			return;
@@ -169,7 +169,12 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		foreach ( $version_tags as $since_tag_token => $version_value_token ) {
 			if ( null === $version_value_token ) {
-				$phpcs_file->addError( $missing_since_tag_error_message, $since_tag_token, $violation_code );
+				$phpcs_file->addError(
+					'Missing @since tag version value for the "%s()" hook function.',
+					$since_tag_token,
+					'MissingHookSinceTagVersionValue',
+					$error_message_data
+				);
 				continue;
 			}
 
@@ -183,10 +188,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				'Invalid @since version value for the "%s()" hook function: "%s". Version value must be greater than or equal to 0.0.1.',
 				$version_value_token,
 				'InvalidHookSinceTagVersionValue',
-				array(
-					$hook_function,
-					$version_value,
-				)
+				array_merge( $error_message_data, array( $version_value ) )
 			);
 		}
 	}
