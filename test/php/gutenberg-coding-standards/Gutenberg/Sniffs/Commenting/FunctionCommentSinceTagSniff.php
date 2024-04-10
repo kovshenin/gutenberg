@@ -347,7 +347,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		foreach ( $version_tags as $since_tag_token => $version_value_token ) {
 			if ( null === $version_value_token ) {
-				$phpcs_file->addError( 'Version value is missing for the @since tag.', $since_tag_token, $missing_version_value_violation_code );
+				$phpcs_file->addError( 'Missing @since tag version value for the "%s()" %s.', $since_tag_token, $missing_version_value_violation_code );
 				continue;
 			}
 
