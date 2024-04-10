@@ -144,6 +144,8 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		$error_message_data = array( $hook_function );
 
+		$violation_codes = static::get_violation_codes( 'Hook' );
+
 		$docblock = static::find_hook_docblock( $phpcs_file, $stack_pointer );
 
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
@@ -159,7 +161,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				$phpcs_file->addError(
 					'Missing @since tag for the "%s()" hook function.',
 					$stack_pointer,
-					'MissingHookSinceTag',
+					$violation_codes['missing_since_tag'],
 					$error_message_data
 				);
 			}
@@ -172,7 +174,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				$phpcs_file->addError(
 					'Missing @since tag version value for the "%s()" hook function.',
 					$since_tag_token,
-					'MissingHookSinceTagVersionValue',
+					$violation_codes['missing_version_value'],
 					$error_message_data
 				);
 				continue;
@@ -187,7 +189,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$phpcs_file->addError(
 				'Invalid @since version value for the "%s()" hook function: "%s". Version value must be greater than or equal to 0.0.1.',
 				$version_value_token,
-				'InvalidHookSinceTagVersionValue',
+				$violation_codes['invalid_version_value'],
 				array_merge( $error_message_data, array( $version_value ) )
 			);
 		}
@@ -201,15 +203,16 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 * @param int  $stack_pointer The position of the OO token in the stack.
 	 */
 	protected function process_oo_token( File $phpcs_file, $stack_pointer ) {
-		$tokens                 = $phpcs_file->getTokens();
-		$token_type             = static::$oo_tokens[ $tokens[ $stack_pointer ]['code'] ]['name'];
-		$capitalized_token_type = ucfirst( $token_type );
+		$tokens     = $phpcs_file->getTokens();
+		$token_type = static::$oo_tokens[ $tokens[ $stack_pointer ]['code'] ]['name'];
 
 		$token_name         = ObjectDeclarations::getName( $phpcs_file, $stack_pointer );
 		$error_message_data = array(
 			$token_name,
 			$token_type,
 		);
+
+		$violation_codes = static::get_violation_codes( ucfirst( $token_type ) );
 
 		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
 
@@ -218,7 +221,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$phpcs_file->addError(
 				'Missing @since tag for the "%s" %s.',
 				$stack_pointer,
-				'Missing' . $capitalized_token_type . 'SinceTag',
+				$violation_codes['missing_since_tag'],
 				$error_message_data
 			);
 			return;
@@ -229,7 +232,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				$phpcs_file->addError(
 					'Missing @since tag version value for the "%s" %s.',
 					$since_tag_token,
-					'Missing' . $capitalized_token_type . 'SinceTagVersionValue',
+					$violation_codes['missing_version_value'],
 					$error_message_data
 				);
 				continue;
@@ -244,7 +247,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$phpcs_file->addError(
 				'Invalid @since version value for the "%s" %s: "%s". Version value must be greater than or equal to 0.0.1.',
 				$version_value_token,
-				'Invalid' . $capitalized_token_type . 'SinceTagVersionValue',
+				$violation_codes['invalid_version_value'],
 				array_merge( $error_message_data, array( $version_value ) )
 			);
 		}
@@ -268,6 +271,8 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
+		$violation_codes = static::get_violation_codes( 'Property' );
+
 		$error_message_data = array(
 			$class_name,
 			$property_name,
@@ -280,7 +285,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$phpcs_file->addError(
 				'Missing @since tag for the "%s::%s" property.',
 				$stack_pointer,
-				'MissingPropertySinceTag',
+				$violation_codes['missing_since_tag'],
 				$error_message_data
 			);
 			return;
@@ -291,7 +296,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				$phpcs_file->addError(
 					'Missing @since tag version value for the "%s::%s" property.',
 					$since_tag_token,
-					'MissingPropertySinceTagVersionValue',
+					$violation_codes['missing_version_value'],
 					$error_message_data
 				);
 				continue;
@@ -306,7 +311,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$phpcs_file->addError(
 				'Invalid @since version value for the "%s::%s" property: "%s". Version value must be greater than or equal to 0.0.1.',
 				$version_value_token,
-				'InvalidPropertySinceTagVersionValue',
+				$violation_codes['invalid_version_value'],
 				array_merge( $error_message_data, array( $version_value ) )
 			);
 		}
@@ -322,28 +327,24 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$tokens = $phpcs_file->getTokens();
 
 		$oo_token      = Scopes::validDirectScope( $phpcs_file, $stack_pointer, Tokens::$ooScopeTokens );
-		$is_oo_method  = Scopes::isOOMethod( $phpcs_file, $stack_pointer );
 		$function_name = ObjectDeclarations::getName( $phpcs_file, $stack_pointer );
 
-		$violation_code                       = 'MissingFunctionSinceTag';
-		$missing_version_value_violation_code = 'MissingFunctionSinceTagVersionValue';
-		$invalid_version_value_violation_code = 'InvalidFunctionSinceTagVersionValue';
-
-		if ( $is_oo_method ) {
+		$token_type = 'function';
+		if ( Scopes::isOOMethod( $phpcs_file, $stack_pointer ) ) {
 			$visibility = FunctionDeclarations::getProperties( $phpcs_file, $stack_pointer )['scope'];
 			if ( $this->check_below_minimum_visibility( $visibility ) ) {
 				return;
 			}
 
-			$function_name                        = ObjectDeclarations::getName( $phpcs_file, $oo_token ) . '::' . $function_name;
-			$violation_code                       = 'MissingMethodSinceTag';
-			$missing_version_value_violation_code = 'MissingMethodSinceTagVersionValue';
-			$invalid_version_value_violation_code = 'InvalidMethodSinceTagVersionValue';
+			$function_name = ObjectDeclarations::getName( $phpcs_file, $oo_token ) . '::' . $function_name;
+			$token_type    = 'method';
 		}
+
+		$violation_codes = static::get_violation_codes( ucfirst( $token_type ) );
 
 		$error_message_data = array(
 			$function_name,
-			$is_oo_method ? 'method' : 'function',
+			$token_type,
 		);
 
 		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
@@ -353,7 +354,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$phpcs_file->addError(
 				'Missing @since tag for the "%s()" %s.',
 				$stack_pointer,
-				$violation_code,
+				$violation_codes['missing_since_tag'],
 				$error_message_data
 			);
 			return;
@@ -364,7 +365,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				$phpcs_file->addError(
 					'Missing @since tag version value for the "%s()" %s.',
 					$since_tag_token,
-					$missing_version_value_violation_code,
+					$violation_codes['missing_version_value'],
 					$error_message_data
 				);
 				continue;
@@ -379,7 +380,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$phpcs_file->addError(
 				'Invalid @since version value for the "%s()" %s: "%s". Version value must be greater than or equal to 0.0.1.',
 				$version_value_token,
-				$invalid_version_value_violation_code,
+				$violation_codes['invalid_version_value'],
 				array_merge( $error_message_data, array( $version_value ) )
 			);
 		}
@@ -398,6 +399,21 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		}
 
 		return version_compare( $version, '0.0.1', '>=' );
+	}
+
+
+	/**
+	 * Returns violation codes for a specific token type.
+	 *
+	 * @param string $token_type The type of token (e.g., Function, Property) to retrieve violation codes for.
+	 * @return array An array containing violation codes for missing since tag, missing version value, and invalid version value.
+	 */
+	protected function get_violation_codes( $token_type ) {
+		return array(
+			'missing_since_tag'     => 'Missing' . $token_type . 'SinceTag',
+			'missing_version_value' => 'Missing' . $token_type . 'VersionValue',
+			'invalid_version_value' => 'Invalid' . $token_type . 'VersionValue',
+		);
 	}
 
 	/**
