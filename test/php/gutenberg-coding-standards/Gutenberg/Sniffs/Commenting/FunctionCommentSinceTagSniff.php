@@ -315,7 +315,9 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$is_oo_method  = Scopes::isOOMethod( $phpcs_file, $stack_pointer );
 		$function_name = ObjectDeclarations::getName( $phpcs_file, $stack_pointer );
 
-		$violation_code = 'MissingFunctionSinceTag';
+		$violation_code                       = 'MissingFunctionSinceTag';
+		$missing_version_value_violation_code = 'MissingFunctionSinceTagVersionValue';
+		$invalid_version_value_violation_code = 'InvalidFunctionSinceTagVersionValue';
 
 		if ( $is_oo_method ) {
 			$visibility = FunctionDeclarations::getProperties( $phpcs_file, $stack_pointer )['scope'];
@@ -323,8 +325,10 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				return;
 			}
 
-			$violation_code = 'MissingMethodSinceTag';
-			$function_name  = ObjectDeclarations::getName( $phpcs_file, $oo_token ) . '::' . $function_name;
+			$function_name                        = ObjectDeclarations::getName( $phpcs_file, $oo_token ) . '::' . $function_name;
+			$violation_code                       = 'MissingMethodSinceTag';
+			$missing_version_value_violation_code = 'MissingMethodSinceTagVersionValue';
+			$invalid_version_value_violation_code = 'InvalidMethodSinceTagVersionValue';
 		}
 
 		$missing_since_tag_error_message = sprintf(
@@ -343,7 +347,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		foreach ( $version_tags as $since_tag_token => $version_value_token ) {
 			if ( null === $version_value_token ) {
-				$phpcs_file->addError( $missing_since_tag_error_message, $since_tag_token, $violation_code );
+				$phpcs_file->addError( 'Version value is missing for the @since tag.', $since_tag_token, $missing_version_value_violation_code );
 				continue;
 			}
 
@@ -356,7 +360,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$phpcs_file->addError(
 				'Invalid @since version value for the "%s()" %s: "%s". Version value must be greater than or equal to 0.0.1.',
 				$version_value_token,
-				$violation_code,
+				$invalid_version_value_violation_code,
 				array(
 					$function_name,
 					$is_oo_method ? 'method' : 'function',
