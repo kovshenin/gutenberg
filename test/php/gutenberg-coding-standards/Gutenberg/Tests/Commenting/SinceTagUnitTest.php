@@ -9,14 +9,14 @@
 
 namespace GutenbergCS\Gutenberg\Tests\Commenting;
 
-use GutenbergCS\Gutenberg\Sniffs\Commenting\FunctionCommentSinceTagSniff;
+use GutenbergCS\Gutenberg\Sniffs\Commenting\SinceTagSniff;
 use GutenbergCS\Gutenberg\Tests\AbstractSniffUnitTest;
 use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
- * Unit test class for the FunctionCommentSinceTagSniff sniff.
+ * Unit test class for the SinceTagSniff sniff.
  */
-final class FunctionCommentSinceTagUnitTest extends AbstractSniffUnitTest {
+final class SinceTagUnitTest extends AbstractSniffUnitTest {
 
 	/**
 	 * Returns the lines where errors should occur.
@@ -174,7 +174,7 @@ final class FunctionCommentSinceTagUnitTest extends AbstractSniffUnitTest {
 	 * @return string The fully qualified class name of the sniff.
 	 */
 	protected function get_sniff_fqcn() {
-		return FunctionCommentSinceTagSniff::class;
+		return SinceTagSniff::class;
 	}
 
 	/**

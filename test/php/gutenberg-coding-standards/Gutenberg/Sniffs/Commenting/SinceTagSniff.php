@@ -20,10 +20,11 @@ use PHPCSUtils\Utils\Scopes;
 use PHPCSUtils\Utils\Variables;
 
 /**
- * This sniff ensures that PHP functions have a valid `@since` tag in the docblock.
- * The sniff skips checking files in __experimental block-library blocks.
+ * This sniff verifies the presence of valid `@since` tags in the docblocks of various PHP structures
+ * and WordPress hooks. Supported structures include classes, interfaces, traits, enums, functions, methods and properties.
+ * Files located within the __experimental block of the block-library are excluded from checks.
  */
-class FunctionCommentSinceTagSniff implements Sniff {
+class SinceTagSniff implements Sniff {
 
 	/**
 	 * Disable the check for functions with a lower visibility than the value given.
