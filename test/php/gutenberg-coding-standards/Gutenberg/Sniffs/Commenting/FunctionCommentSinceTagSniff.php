@@ -331,23 +331,32 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$invalid_version_value_violation_code = 'InvalidMethodSinceTagVersionValue';
 		}
 
-		$missing_since_tag_error_message = sprintf(
-			'@since tag is missing for the "%s()" %s.',
-			$function_name,
-			$is_oo_method ? 'method' : 'function'
-		);
-
 		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
+
+		$error_message_data = array(
+			$function_name,
+			$is_oo_method ? 'method' : 'function',
+		);
 
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
-			$phpcs_file->addError( $missing_since_tag_error_message, $stack_pointer, $violation_code );
+			$phpcs_file->addError(
+				'@since tag is missing for the "%s()" %s.',
+				$stack_pointer,
+				$violation_code,
+				$error_message_data
+			);
 			return;
 		}
 
 		foreach ( $version_tags as $since_tag_token => $version_value_token ) {
 			if ( null === $version_value_token ) {
-				$phpcs_file->addError( 'Missing @since tag version value for the "%s()" %s.', $since_tag_token, $missing_version_value_violation_code );
+				$phpcs_file->addError(
+					'Missing @since tag version value for the "%s()" %s.',
+					$since_tag_token,
+					$missing_version_value_violation_code,
+					$error_message_data
+				);
 				continue;
 			}
 
@@ -361,11 +370,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				'Invalid @since version value for the "%s()" %s: "%s". Version value must be greater than or equal to 0.0.1.',
 				$version_value_token,
 				$invalid_version_value_violation_code,
-				array(
-					$function_name,
-					$is_oo_method ? 'method' : 'function',
-					$version_value,
-				)
+				array_merge( $error_message_data, array( $version_value ) )
 			);
 		}
 	}
