@@ -341,7 +341,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
 			$phpcs_file->addError(
-				'@since tag is missing for the "%s()" %s.',
+				'Missing @since tag for the "%s()" %s.',
 				$stack_pointer,
 				$violation_code,
 				$error_message_data
