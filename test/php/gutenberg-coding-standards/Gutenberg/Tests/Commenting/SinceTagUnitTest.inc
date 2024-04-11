@@ -329,24 +329,24 @@ abstract class Bar_Abstract {
  * @since
  * 123
  */
-class Bar_1 {
+abstract class Bar_1 {
 }
 
 /**
  * @since invalid 123
  */
-class Bar_2 {
+abstract class Bar_2 {
 }
 
 /**
  * @since 123
  */
-class Bar_3 {
+abstract class Bar_3 {
 }
 
 $variable = 'some_value'; /** Some comment @since 123 */
 
-class Bar_4 {
+abstract class Bar_4 {
 }
 
 /**
@@ -356,7 +356,7 @@ class Bar_4 {
  * @since invalid_value
  * @since
  */
-class Bar_5 {
+abstract class Bar_5 {
 }
 
 Trait Baz {
@@ -469,24 +469,24 @@ Trait Baz {
  * @since
  * 123
  */
-class Baz_1 {
+trait Baz_1 {
 }
 
 /**
  * @since invalid 123
  */
-class Baz_2 {
+trait Baz_2 {
 }
 
 /**
  * @since 123
  */
-class Baz_3 {
+trait Baz_3 {
 }
 
 $variable = 'some_value'; /** Some comment @since 123 */
 
-class Baz_4 {
+trait Baz_4 {
 }
 
 interface Qux {
@@ -526,24 +526,24 @@ interface Qux {
  * @since
  * 123
  */
-class Qux_1 {
+interface Qux_1 {
 }
 
 /**
  * @since invalid 123
  */
-class Qux_2 {
+interface Qux_2 {
 }
 
 /**
  * @since 123
  */
-class Qux_3 {
+interface Qux_3 {
 }
 
 $variable = 'some_value'; /** Some comment @since 123 */
 
-class Qux_4 {
+interface Qux_4 {
 }
 
 $result = do_action( 'some_filter', array() );
