@@ -38,7 +38,8 @@ import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
-const { isOverridableBlock } = unlock( patternsPrivateApis );
+const { isOverridableBlock, PARTIAL_SYNCING_SUPPORTED_BLOCKS } =
+	unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -98,11 +99,24 @@ function hasOverridableBlocks( blocks ) {
 }
 
 function getOverridableAttributes( block ) {
-	return Object.entries( block.attributes.metadata.bindings )
-		.filter(
-			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
-		)
-		.map( ( [ attributeKey ] ) => attributeKey );
+	const set = new Set();
+	for ( const [ attributeKey, binding ] of Object.entries(
+		block.attributes.metadata.bindings
+	) ) {
+		if (
+			attributeKey === '__default' &&
+			binding.source === 'core/pattern-overrides'
+		) {
+			PARTIAL_SYNCING_SUPPORTED_BLOCKS[ block.name ].forEach(
+				( attribute ) => {
+					set.add( attribute );
+				}
+			);
+		} else if ( binding.source === 'core/pattern-overrides' ) {
+			set.add( attributeKey );
+		}
+	}
+	return Array.from( set );
 }
 
 function applyInitialContentValuesToInnerBlocks(
