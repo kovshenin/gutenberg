@@ -149,20 +149,17 @@ export default function useThemeStyleVariationsByProperty( {
 				? cloneDeep( baseVariation )
 				: null;
 
-		let processedStyleVariations = variations
-			// Remove variations that are empty once the property is filtered out.
-			.filter( ( variation ) => {
+		let processedStyleVariations = variations.reduce(
+			( accumulator, variation ) => {
 				const variationFilteredByProperty = filterObjectByProperty(
 					cloneDeep( variation ),
 					property
 				);
-				return Object.keys( variationFilteredByProperty ).length > 0;
-			} )
-			.map( ( variation ) => {
-				const variationFilteredByProperty = filterObjectByProperty(
-					cloneDeep( variation ),
-					property
-				);
+				// Remove variations that are empty once the property is filtered out.
+				if ( Object.keys( variationFilteredByProperty ).length === 0 ) {
+					return accumulator;
+				}
+
 				let result = {
 					...variationFilteredByProperty,
 					title: variation?.title,
@@ -179,8 +176,11 @@ export default function useThemeStyleVariationsByProperty( {
 						result
 					);
 				}
-				return result;
-			} );
+				accumulator.push( result );
+				return accumulator;
+			},
+			[] // Initial accumulator value.
+		);
 
 		if ( 'function' === typeof filter ) {
 			processedStyleVariations =
