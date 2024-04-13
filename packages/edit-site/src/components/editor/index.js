@@ -107,14 +107,18 @@ export default function Editor( { isLoading, onClick } ) {
 		isInserterOpen,
 		isListViewOpen,
 		isDistractionFree,
+		isRichEditingEnabled,
+		isStyleBookOpened,
 		showIconLabels,
 		showBlockBreadcrumbs,
 		postTypeLabel,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditedPostContext, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
+		const {
+			getEditedPostContext,
+			getCanvasMode,
+			getEditorCanvasContainerView,
+		} = unlock( select( editSiteStore ) );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
@@ -123,6 +127,7 @@ export default function Editor( { isLoading, onClick } ) {
 			isListViewOpened,
 			getPostTypeLabel,
 			getEditorMode,
+			getEditorSettings,
 		} = select( editorStore );
 		const _context = getEditedPostContext();
 
@@ -146,6 +151,8 @@ export default function Editor( { isLoading, onClick } ) {
 				editSiteStore.name
 			),
 			isDistractionFree: get( 'core', 'distractionFree' ),
+			isRichEditingEnabled: getEditorSettings().richEditingEnabled,
+			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			postTypeLabel: getPostTypeLabel(),
@@ -154,7 +161,14 @@ export default function Editor( { isLoading, onClick } ) {
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
-	const showVisualEditor = isViewMode || editorMode === 'visual';
+	const showVisualEditor =
+		isViewMode ||
+		( editorMode === 'visual' && isRichEditingEnabled ) ||
+		isStyleBookOpened;
+	const showCodeEditor =
+		isEditMode &&
+		( editorMode === 'text' || ! isRichEditingEnabled ) &&
+		! isStyleBookOpened;
 	const shouldShowBlockBreadcrumbs =
 		! isDistractionFree &&
 		showBlockBreadcrumbs &&
@@ -274,9 +288,7 @@ export default function Editor( { isLoading, onClick } ) {
 										<PatternModal />
 									</>
 								) }
-								{ editorMode === 'text' && isEditMode && (
-									<CodeEditor />
-								) }
+								{ showCodeEditor && <CodeEditor /> }
 								{ isEditMode && (
 									<>
 										<KeyboardShortcutsEditMode />
