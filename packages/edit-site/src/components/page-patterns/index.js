@@ -55,14 +55,7 @@ import {
 	ENUMERATION_TYPE,
 	OPERATOR_IS,
 } from '../../utils/constants';
-import {
-	exportJSONaction,
-	renameAction,
-	resetAction,
-	deleteAction,
-	duplicatePatternAction,
-	duplicateTemplatePartAction,
-} from './dataviews-pattern-actions';
+import { duplicateTemplatePartAction } from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
@@ -440,42 +433,78 @@ export default function DataviewsPatterns() {
 	const history = useHistory();
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					categoryId,
-					categoryType: type,
-					canvas: 'edit',
-				} );
+			switch ( actionId ) {
+				case 'edit-post':
+					{
+						const post = items[ 0 ];
+						history.push( {
+							postId: post.id,
+							postType: post.type,
+							categoryId,
+							categoryType: type,
+							canvas: 'edit',
+						} );
+					}
+					break;
+				case 'duplicate-pattern':
+					{
+						const pattern = items[ 0 ];
+						history.push( {
+							categoryType: PATTERN_TYPES.theme,
+							categoryId,
+							postType: PATTERN_TYPES.user,
+							postId: pattern.id,
+						} );
+					}
+					break;
 			}
 		},
-		[ history ]
+		[ categoryId, history, type ]
 	);
-	const [ editAction, viewRevisionsAction ] = usePostActions(
-		onActionPerformed,
-		[ 'edit-post', 'view-post-revisions' ]
-	);
+	const [
+		editAction,
+		renamePatternAction,
+		duplicatePatternAction,
+		exportPatternAsJSONAction,
+		viewRevisionsAction,
+		resetTemplatePartAction,
+		deletePatternAction,
+	] = usePostActions( onActionPerformed, [
+		'edit-post',
+		'rename-pattern',
+		'duplicate-pattern',
+		'export-pattern',
+		'view-post-revisions',
+		'reset-template-part',
+		'delete-pattern',
+	] );
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
 			return [
 				editAction,
-				renameAction,
+				renamePatternAction,
 				duplicateTemplatePartAction,
 				viewRevisionsAction,
-				resetAction,
-				deleteAction,
+				resetTemplatePartAction,
+				deletePatternAction,
 			];
 		}
 		return [
-			renameAction,
+			renamePatternAction,
 			duplicatePatternAction,
-			exportJSONaction,
-			resetAction,
-			deleteAction,
+			exportPatternAsJSONAction,
+			deletePatternAction,
 		];
-	}, [ type, editAction, viewRevisionsAction ] );
+	}, [
+		type,
+		renamePatternAction,
+		duplicatePatternAction,
+		exportPatternAsJSONAction,
+		deletePatternAction,
+		editAction,
+		viewRevisionsAction,
+		resetTemplatePartAction,
+	] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
