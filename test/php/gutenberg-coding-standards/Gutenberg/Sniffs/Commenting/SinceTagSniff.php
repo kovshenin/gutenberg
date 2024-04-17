@@ -82,7 +82,6 @@ class SinceTagSniff implements Sniff {
 
 	/**
 	 * Processes the tokens that this sniff is interested in.
-	 * The implementation was copied from PHPCompatibility\Sniffs\Extensions\RemovedExtensionsSniff::process().
 	 *
 	 * @param File $phpcsFile The file being scanned.
 	 * @param int  $stackPtr  The position of the current token in the stack passed in $tokens.
@@ -461,6 +460,7 @@ class SinceTagSniff implements Sniff {
 
 	/**
 	 * Determines if a T_STRING token represents a function call.
+	 * The implementation was copied from PHPCompatibility\Sniffs\Extensions\RemovedExtensionsSniff::process().
 	 *
 	 * @param File $phpcs_file    The file being scanned.
 	 * @param int  $stack_pointer The position of the T_STRING token in question.
