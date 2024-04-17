@@ -82,6 +82,7 @@ class SinceTagSniff implements Sniff {
 
 	/**
 	 * Processes the tokens that this sniff is interested in.
+	 * The implementation was copied from PHPCompatibility\Sniffs\Extensions\RemovedExtensionsSniff::process().
 	 *
 	 * @param File $phpcsFile The file being scanned.
 	 * @param int  $stackPtr  The position of the current token in the stack passed in $tokens.
@@ -497,7 +498,7 @@ class SinceTagSniff implements Sniff {
 
 	/**
 	 * Finds the docblock preceding a specified position (stack pointer) in a given PHP file.
-	 * The implementation was copied from FunctionCommentSniff::process().
+	 * The implementation was copied from PHP_CodeSniffer\Standards\PEAR\Sniffs\Commenting\FunctionCommentSniff::process().
 	 *
 	 * @param File $phpcs_file    The file being scanned.
 	 * @param int  $stack_pointer The position (stack pointer) in the token stack from which to start searching backwards.
