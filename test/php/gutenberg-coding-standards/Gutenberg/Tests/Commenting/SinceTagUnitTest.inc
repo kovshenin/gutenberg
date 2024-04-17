@@ -625,3 +625,5 @@ $foo = new apply_filters_ref_array();
 $foo->apply_filters_ref_array();
 $foo = new apply_filters_deprecated();
 $foo->apply_filters_deprecated();
+$foo = new non_hook_action();
+$foo->non_hook_action();
