@@ -612,3 +612,16 @@ if ( ! function_exists( 'apply_filters_deprecated' ) ) {
 	function apply_filters_deprecated() {
 	}
 }
+
+$some_object = new do_action();
+$some_object = $my_object->do_action();
+$some_object = new do_action_ref_array();
+$some_object = $my_object->do_action_ref_array();
+$some_object = new do_action_deprecated();
+$some_object = $my_object->do_action_deprecated();
+$some_object = new apply_filters();
+$some_object = $my_object->apply_filters();
+$some_object = new apply_filters_ref_array();
+$some_object = $my_object->apply_filters_ref_array();
+$some_object = new apply_filters_deprecated();
+$some_object = $my_object->apply_filters_deprecated();

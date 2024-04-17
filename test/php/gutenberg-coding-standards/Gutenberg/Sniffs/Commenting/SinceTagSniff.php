@@ -462,7 +462,7 @@ class SinceTagSniff implements Sniff {
 	 * Determines if a T_STRING token represents a function call.
 	 *
 	 * @param File $phpcs_file    The file being scanned.
-	 * @param int  $stack_pointer The position to start looking for the docblock.    *
+	 * @param int  $stack_pointer The position of the T_STRING token in question.
 	 * @return bool True if the token represents a function call, false otherwise.
 	 */
 	protected static function is_function_call( File $phpcs_file, $stack_pointer ) {
@@ -476,7 +476,7 @@ class SinceTagSniff implements Sniff {
 			return false;
 		}
 
-		if ( isset( $tokens[ $open_bracket ]['parenthesis_closer'] ) === false ) {
+		if ( false === isset( $tokens[ $open_bracket ]['parenthesis_closer'] ) ) {
 			// Not a function call.
 			return false;
 		}
@@ -485,12 +485,14 @@ class SinceTagSniff implements Sniff {
 		$search   = Tokens::$emptyTokens;
 		$search[] = T_BITWISE_AND;
 		$previous = $phpcs_file->findPrevious( $search, ( $stack_pointer - 1 ), null, true );
-		if ( T_FUNCTION === $tokens[ $previous ]['code'] ) {
-			// It's a function definition, not a function call.
-			return false;
-		}
 
-		return true;
+		$previous_tokens_to_ignore = array(
+			T_FUNCTION, // Function declaration.
+			T_NEW, // Creating an object.
+			T_OBJECT_OPERATOR, // Calling an object.
+		);
+
+		return ! in_array( $tokens[ $previous ]['code'], $previous_tokens_to_ignore, true );
 	}
 
 	/**
