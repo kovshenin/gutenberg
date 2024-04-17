@@ -360,16 +360,16 @@ function TableRow( {
 }
 
 function ViewTable( {
-	view,
-	onChangeView,
-	fields,
 	actions,
 	data,
+	fields,
 	getItemId,
 	isLoading = false,
-	selection,
+	onChangeView,
 	onSelectionChange,
+	selection,
 	setOpenedFilter,
+	view,
 } ) {
 	const headerMenuRefs = useRef( new Map() );
 	const headerMenuToFocusRef = useRef();
