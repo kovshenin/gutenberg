@@ -1217,7 +1217,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const { themeDirURI, disableLayoutStyles } = useSelect( ( select ) => {
 		const _settings = select( blockEditorStore ).getSettings();
 		return {
-			themeDirURI: _settings?.currentTheme?.directoryURI,
+			themeDirURI: _settings?.currentTheme?.stylesheetURI,
 			disableLayoutStyles: !! _settings.disableLayoutStyles,
 		};
 	} );
