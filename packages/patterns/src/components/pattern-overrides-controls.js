@@ -38,9 +38,10 @@ function PatternOverridesControls( { attributes, setAttributes } ) {
 	const [ showDisallowOverridesModal, setShowDisallowOverridesModal ] =
 		useState( false );
 
+	const hasName = !! attributes.metadata?.name;
 	const defaultBindings = attributes.metadata?.bindings?.__default;
 	const allowOverrides =
-		defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
+		hasName && defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
 	const isConnectedToOtherSources =
 		defaultBindings?.source &&
 		defaultBindings.source !== PATTERN_OVERRIDES_BINDING_SOURCE;
@@ -67,14 +68,6 @@ function PatternOverridesControls( { attributes, setAttributes } ) {
 
 	// Avoid overwriting other (e.g. meta) bindings.
 	if ( isConnectedToOtherSources ) return null;
-
-	const hasName = !! attributes.metadata?.name;
-	const allowOverrides =
-		hasName &&
-		attributeSources.some(
-			( source ) => source === PATTERN_OVERRIDES_BINDING_SOURCE
-		);
-
 	return (
 		<>
 			<InspectorControls group="advanced">
