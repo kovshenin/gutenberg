@@ -6,7 +6,6 @@ import { PanelBody, PanelRow } from '@wordpress/components';
 import {
 	PageAttributesPanel,
 	PostDiscussionPanel,
-	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	privateApis as editorPrivateApis,
@@ -135,7 +134,6 @@ export default function TemplatePanel() {
 			) }
 			<PostLastRevisionPanel />
 			<PostTaxonomiesPanel />
-			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />
 			<PatternOverridesPanel />

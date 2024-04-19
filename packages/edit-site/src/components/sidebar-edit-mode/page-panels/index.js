@@ -9,7 +9,6 @@ import {
 	PageAttributesPanel,
 	PluginDocumentSettingPanel,
 	PostDiscussionPanel,
-	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	store as editorStore,
@@ -97,7 +96,6 @@ export default function PagePanels() {
 			) }
 			<PostLastRevisionPanel />
 			<PostTaxonomiesPanel />
-			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />
 		</>

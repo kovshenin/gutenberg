@@ -26,6 +26,7 @@ import PostActions from './components/post-actions';
 import { usePostActions } from './components/post-actions/actions';
 import PostCardPanel from './components/post-card-panel';
 import PostStatus from './components/post-status';
+import { PrivatePostExcerptPanel } from './components/post-excerpt/panel';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -48,6 +49,7 @@ lock( privateApis, {
 	usePostActions,
 	PostCardPanel,
 	PostStatus,
+	PrivatePostExcerptPanel,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useAutoSwitchEditorSidebars,
