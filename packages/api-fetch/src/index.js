@@ -187,7 +187,7 @@ function apiFetch( options ) {
 }
 
 if ( typeof document !== 'undefined' ) {
-	const el = document.getElementById( '#wp-apifetch-config-data' );
+	const el = document.getElementById( 'wp-apifetch-config-data' );
 	if ( el?.textContent ) {
 		try {
 			const config = JSON.parse( el.textContent );
